@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <meta name="theme-color" content="#2980b9">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora IRPF Mensal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #2980b9;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2471a3;
+    }
+    .resultado {
+      margin-top: 25px;
+      font-weight: bold;
+      color: #27ae60;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Calculadora IRPF Mensal (2025) Cafeara</h2>
+
+    <label for="salario">Salário bruto mensal (R$):</label>
+    <input type="text" id="salario" placeholder="Ex: 5.000,00" oninput="formatarMoeda(this)" />
+
+    <label for="vale">- Vale Alimentação (R$):</label>
+    <input type="text" id="vale" placeholder="Ex: 600,00" oninput="formatarMoeda(this)" />
+
+    <label for="idade">Idade do contribuinte:</label>
+    <select id="idade">
+      <option value="menor">Menor de 65 anos</option>
+      <option value="maior">65 anos ou mais</option>
+    </select>
+
+    <label for="dependentes">Número de dependentes:</label>
+    <input type="number" id="dependentes" value="0" />
+
+    <label for="deducoes">Outras deduções mensais (R$): Ex. Previdência</label>
+    <input type="text" id="deducoes" placeholder="Ex: 500,00" oninput="formatarMoeda(this)" />
+
+    <button onclick="calcularIR()">Calcular IRPF</button>
+
+    <div class="resultado" id="resultado"></div>
+  </div>
+
+  <script>
+    function formatarMoeda(campo) {
+      let valor = campo.value.replace(/\D/g, '');
+      valor = (parseFloat(valor) / 100).toFixed(2);
+      campo.value = parseFloat(valor).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function limparMoeda(valor) {
+      return parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
+    }
+
+    function calcularIR() {
+      const salario = limparMoeda(document.getElementById('salario').value);
+      const vale = limparMoeda(document.getElementById('vale').value);
+      const dependentes = parseInt(document.getElementById('dependentes').value) || 0;
+      const outrasDeducoes = limparMoeda(document.getElementById('deducoes').value);
+      const maior65 = document.getElementById('idade').value === 'maior';
+
+      const deducaoDependentes = dependentes * 189.59;
+      const isencao65 = maior65 ? 1903.98 : 0;
+      const totalDeducoes = deducaoDependentes + outrasDeducoes + isencao65;
+      const baseCalculo = salario - vale - totalDeducoes;
+
+      let imposto = 0;
+
+      if (baseCalculo <= 2259.20) {
+        imposto = 0;
+      } else if (baseCalculo <= 2826.65) {
+        imposto = baseCalculo * 0.075 - 169.44;
+      } else if (baseCalculo <= 3751.05) {
+        imposto = baseCalculo * 0.15 - 381.44;
+      } else if (baseCalculo <= 4664.68) {
+        imposto = baseCalculo * 0.225 - 662.77;
+      } else {
+        imposto = baseCalculo * 0.275 - 896.00;
+      }
+
+      imposto = Math.max(0, imposto);
+
+      const formatar = valor => valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+
+      const resultado = `
+        Salário bruto: ${formatar(salario)}<br>
+        Vale Alimentação: ${formatar(vale)}<br>
+        Total de deduções: ${formatar(totalDeducoes)}<br>
+        Base de cálculo: ${formatar(baseCalculo)}<br>
+        IRPF devido: <strong>${formatar(imposto)}</strong>
+      `;
+
+      document.getElementById('resultado').innerHTML = resultado;
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registrado:', reg.scope))
+          .catch(err => console.log('Erro ao registrar SW:', err));
+      });
+    }
+
+  </script>
+</body>
+</html>

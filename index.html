@@ -64,9 +64,9 @@
 </head>
 <body>
   <div class="container">
-    <h2>Calculadora IRPF Mensal (2025) Cafeara</h2>
+    <h2>Calculadora IRPF Mensal (Maio de 2025) Cafeara</h2>
 
-    <label for="salario">Total de vantagens (R$):</label>
+    <label for="salario">Salário bruto mensal (R$):</label>
     <input type="text" id="salario" placeholder="Ex: 5.000,00" oninput="formatarMoeda(this)" />
 
     <label for="vale">- Vale Alimentação (R$):</label>
@@ -81,7 +81,7 @@
     <label for="dependentes">Número de dependentes:</label>
     <input type="number" id="dependentes" value="0" />
 
-    <label for="deducoes">Desconto Previdência (R$): </label>
+    <label for="deducoes">Outras deduções mensais (R$): Ex. Previdência</label>
     <input type="text" id="deducoes" placeholder="Ex: 500,00" oninput="formatarMoeda(this)" />
 
     <button onclick="calcularIR()">Calcular IRPF</button>
@@ -117,16 +117,16 @@
 
       let imposto = 0;
 
-      if (baseCalculo <= 2259.20) {
+      if (baseCalculo <= 2428.80) {
         imposto = 0;
       } else if (baseCalculo <= 2826.65) {
-        imposto = baseCalculo * 0.075 - 169.44;
+        imposto = baseCalculo * 0.075 - 182.16;
       } else if (baseCalculo <= 3751.05) {
-        imposto = baseCalculo * 0.15 - 381.44;
+        imposto = baseCalculo * 0.15 - 394.16;
       } else if (baseCalculo <= 4664.68) {
-        imposto = baseCalculo * 0.225 - 662.77;
+        imposto = baseCalculo * 0.225 - 675.49;
       } else {
-        imposto = baseCalculo * 0.275 - 896.00;
+        imposto = baseCalculo * 0.275 - 908.73;
       }
 
       imposto = Math.max(0, imposto);
